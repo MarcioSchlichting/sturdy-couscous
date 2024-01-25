@@ -1,19 +1,27 @@
 import { useState } from 'react';
 import generateStrongPassword from './utils/password-generator.ts';
 import copyToClipboard from './utils/clipboard.ts';
-import './App.css';
+import padlockLogo from './images/padlock.svg';
+import copyToClipboardIcon from './images/copy-to-clipboard.svg';
+import copyToClipboardIconGreen from './images/copy-to-clipboard-green.svg';
+import loading from './images/loading.svg';
 
 function App() {
     const PASSWORD_LENGTH = 30;
-    const [password, setPassword] = useState('test');
+    const [password, setPassword] = useState('');
+    const [isCopied, setIsCopied] = useState(false);
     
     const handleGeneratePassword = () => {
         let strongPassword = generateStrongPassword(PASSWORD_LENGTH);
-        setPassword(strongPassword);
+            setPassword(strongPassword);
     }
     
-    const handleCopyToClipboard = async () => {
-        await copyToClipboard(password);
+    const handleCopyToClipboard = () => {
+        copyToClipboard(password)
+            .then(() => setIsCopied(true))
+            .catch((err) => console.log(err));
+        
+        setTimeout(() => setIsCopied(false), 2000);
     }
     
     return (
@@ -28,35 +36,45 @@ function App() {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                borderRadius: '3px',
-                width: '300px',
+                borderRadius: '10px',
+                width: '25vw',
                 height: '200px',
                 backgroundColor: 'lightblue',
                 padding: '20px'
             }}>
-                <button
+                <img src={padlockLogo} 
                     style={{
-                        width: '200px',
-                        height: '40px',
-                        marginBottom: '20px',
-                        cursor: 'pointer'
-                    }}
-                    onClick={handleGeneratePassword}
-                >
-                    Generate a strong password
-                </button>
-
-                <p style={{ wordWrap: 'break-word' }}>{password}</p>
+                    width: '50px', 
+                    height: '80px'}} alt='logo'/>
                 
-                <button id='clipboardBtn' onClick={() => copyToClipboard(password)}
-                    style={{
-                    width: '200px',
-                    height: '40px',
-                    marginBottom: '20px',
-                    cursor: 'pointer'
+                <div style={{
+                    marginTop: '20px',
+                    width: '100%',
+                    display:'flex',
+                    alignItems: 'space-between',
+                    height: '50px',
+                    borderRadius: '10px',
+                    backgroundColor: 'white',
+                    alignContent: 'center',
+                    marginBottom: '20px'
                 }}>
-                    Copy to Clipboard
-                </button >
+
+                    <p style={{ 
+                        wordWrap: 'break-word', 
+                        paddingInlineStart: '5px', 
+                        display: 'inherit',
+                        height: 'inherit', 
+                        width: '85%' }}>{password}</p>
+
+                    <img src={loading} alt='new password'
+                         style={{ margin:'auto', height:'inherit', cursor: 'pointer'}}
+                         onClick={handleGeneratePassword}
+                    />
+                    <img src={ isCopied ? copyToClipboardIconGreen : copyToClipboardIcon} alt='copy to clipboard'
+                         style={{ margin:'auto', height:'inherit', cursor: 'pointer'}}
+                         onClick={handleCopyToClipboard}
+                    />
+                </div>
             </div>
         </div>
     );
